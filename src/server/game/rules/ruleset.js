@@ -629,13 +629,12 @@ const RULES = [
     id: "inst_sniper",
     kind: "instant",
     name: "Sniper",
-    description: "A random non-king piece on each side is silently eliminated. No explosion — it just vanishes.",
+    description: "A random non-king piece on each side is silently eliminated.",
     apply(game) {
       for (const c of ["w", "b"]) {
         const sq = randomPieceSquare(game, c, (p) => p.type !== "k");
         if (sq == null) continue;
         game.state.board[sq] = null;
-        // No explosion effect — silent removal is the flavour.
         game.effects.push({ type: "log", id: game.nextEffectId(), text: `Sniper eliminated a ${c === "w" ? "White" : "Black"} piece at ${idxToAlg(sq)}.` });
       }
     },
@@ -1033,7 +1032,7 @@ const RULES = [
     kind: "delayed",
     delayTurns: 10,
     name: "Orbital Strike",
-    description: "In 10 turns, a marked square is obliterated — the piece on it and all adjacent pieces are destroyed.",
+    description: "In 10 turns, a marked square is obliterated - the piece on it and all adjacent pieces are destroyed.",
     onSchedule(game, inst) {
       const candidates = [...Array(64).keys()].filter((i) => !game.missingSquares.has(i));
       inst.data.targetSq = candidates[randInt(candidates.length)];
@@ -1120,9 +1119,9 @@ const RULES = [
     kind: "delayed",
     delayTurns: 6,
     name: "Copycat Delayed",
-    description: "In 6 turns, piece positions revert to how they were right now — but captured pieces stay captured.",
+    description: "In 6 turns, piece positions revert to how they were right now, but captured pieces stay captured.",
     onSchedule(game, inst) {
-      // Snapshot current piece positions only (not counts — pieces that die stay dead).
+      // Snapshot current piece positions only
       inst.data.snapshot = game.state.board.map((p) =>
         p ? { type: p.type, color: p.color, moved: p.moved, tags: p.tags ? [...p.tags] : undefined, movesAs: p.movesAs ? [...p.movesAs] : undefined } : null
       );
