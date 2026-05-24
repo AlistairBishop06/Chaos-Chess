@@ -137,8 +137,6 @@ Note: the current test script is a placeholder, but the codebase is organized so
 
 ## Configuration
 
-The server reads `.env` first, then `env`, if present.
-
 | Variable | Default | Description |
 | --- | --- | --- |
 | `PORT` | `3000` | HTTP server port. |
