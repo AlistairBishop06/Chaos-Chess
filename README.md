@@ -1,6 +1,6 @@
 # Chaos Chess
 
-**Chaos Chess is a full-stack multiplayer chess variant where normal chess becomes a live strategy party game.** Players create lobbies, play legal chess on an authoritative server, and periodically draft rule cards that mutate the board, pieces, win conditions, hazards, and even the UI itself.
+**Chaos Chess is a full-stack multiplayer chess variant where normal chess becomes a live strategy party game.** Players create lobbies, play chess on an authoritative server, and periodically draft rule cards that mutate the board, pieces, win conditions, hazards, and even the UI itself.
 
 Live demo: https://chaoschess.onrender.com/
 
