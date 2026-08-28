@@ -1,316 +1,263 @@
 # Chaos Chess
 
-**Chaos Chess is a full-stack multiplayer chess variant where normal chess becomes a live strategy party game.** Players create lobbies, play chess on an authoritative server, and periodically draft rule cards that mutate the board, pieces, win conditions, hazards, and even the UI itself.
+Chaos Chess is a full-stack multiplayer chess variant that turns a normal match into a live strategy party game. Players make standard chess moves while periodically drafting rule cards that can alter pieces, board geometry, hazards, win conditions and even the interface itself.
 
-Live demo: https://chaoschess.onrender.com/
+The project combines a custom chess engine with an authoritative Node.js multiplayer server, persistent player accounts, singleplayer progression and a canvas-based browser client. Socket.IO keeps matches synchronised in realtime while the server remains responsible for move legality, timers and rule resolution.
 
-Built as a portfolio project, Chaos Chess combines realtime multiplayer infrastructure, a custom chess engine, account persistence, singleplayer progression, cosmetics, achievements, daily shop rotation, and a canvas-heavy frontend into one playable web app.
+**Live demo:** https://chaoschess.onrender.com/
 
-## Highlights
+## Features
 
-- **Realtime 1v1 multiplayer** with public/private lobbies, six-character lobby codes, reconnect support, and Socket.IO state sync.
-- **Singleplayer campaign** against Chaos Bot, with level progression and rule unlocks.
-- **Authoritative chess engine** with legal move generation, check/checkmate handling, castling, en passant, promotion, replayable state, and server-side validation for every move.
-- **88 rule cards** split across instant, delayed, duration, and permanent effects.
-- **Rule draft loop** where players periodically choose from random cards and both selected rules apply.
-- **Interactive mini-games** including Rock Paper Scissors, Coinflip Wager, Supermarket, Fruit Machine, Mutant fusion, targeted rules, and Pawn Soldier shots.
-- **Persistent accounts** with stats, ratings, match history, social lists, achievements, coins, cosmetics, and profile customization.
-- **Daily cosmetics shop** with seeded DiceBear avatar themes, profile banners, board skins, piece skins, animated borders, emotes, and card backs.
-- **Personalized profile avatars** generated through DiceBear using stable per-user seeds, so every user has a unique avatar in each icon theme.
-- **Canvas-first game client** with animated move effects, portals, hazards, shields, overlays, rule popups, modals, confetti, and responsive UI.
-- **Admin tools** for user inspection/editing and runtime flag management.
-- **Flexible persistence**: local JSON storage for development or PostgreSQL for production.
+### Realtime multiplayer
 
-## Gameplay
+* Create public or private two-player lobbies
+* Join private matches using six-character lobby codes
+* Browse currently available public games
+* Recover player connections after temporary disconnects
+* Synchronise player-specific game state through Socket.IO
+* Keep move validation, timers and rule effects authoritative on the server
 
-Chaos Chess starts from normal chess, then steadily breaks the board in interesting ways.
+### Custom chess and rule engine
 
-1. Sign up or log in.
-2. Create a public/private lobby, join a friend, or start singleplayer.
-3. Play legal chess moves.
-4. Every rule draft interval, choose a card before the timer expires.
-5. Survive the combined effects, hazards, mini-games, and board mutations.
-6. Win by checkmate, rule-specific win conditions, or whatever chaos the match creates.
+Chaos Chess implements its chess logic directly rather than delegating matches to a third-party chess engine.
 
-Example rule effects include:
+* Legal move generation and server-side move validation
+* Check and checkmate handling
+* Castling, en passant and promotion
+* Rule effects that can change pieces, squares and movement behaviour
+* Instant, delayed, timed and permanent rule lifecycles
+* Targeted rules that require additional player interaction
 
-- Black holes, lava, asteroid debris, plague, missing squares, portals, fans, ice, gravity, and wrap-around movement.
-- Piece mutation, temporary queens, titan pieces, mutant fusion, king shields, identity swaps, pawn soldiers, suicide bombers, and secret vital pieces.
-- Board-wide events like deleted columns, edge rotation, bishop shuffle, rook mirror, hard reset, soft reset, lawnmower sweeps, and orbital strikes.
-- UI and information effects like visual flip, colour blind mode, ads, hidden information, and custom target prompts.
+The rule system extends normal chess with effects such as portals, lava, black holes, missing squares, piece mutation, shields, board rotation and alternative win conditions.
 
-## Core Systems
+### Rule drafting and mini-games
 
-### Realtime Multiplayer
+Matches periodically enter a rule-selection phase where players choose cards before play resumes.
 
-The multiplayer layer is built on Socket.IO. The server owns all room state, move legality, timers, rule resolution, mini-games, and result recording. Clients send intents; the server replies with accepted state.
+Several rules introduce their own interactive systems, including:
 
-Key features:
+* Rock Paper Scissors
+* Coinflip Wager
+* Supermarket
+* Fruit Machine
+* Mutant piece fusion
+* Pawn Soldier targeting
 
-- Public server browser.
-- Private lobby codes.
-- Automatic game start when two players join.
-- Reconnect and socket rebinding.
-- Room cleanup for abandoned sessions.
-- Per-player state payloads for private information.
-- Server-ticked rule-choice and mini-game timeouts.
+These interactions are controlled by the same server-side match state as normal chess turns rather than running as isolated client effects.
 
-### Chess And Rule Engine
+### Accounts and progression
 
-The backend separates core chess logic from variant rule lifecycle:
+Players can create persistent accounts containing gameplay and profile state.
 
-- `ChessEngine.js` handles board representation, legal moves, check rules, castling, en passant, and promotion.
-- `Game.js` owns match state, turn progression, player phases, effects, hazards, stats, and sync payloads.
-- `RuleManager.js` manages instant, delayed, duration, and permanent rule timing.
-- `ruleset.js` contains the 88 rule cards.
-- `miniGames.js` handles interactive rule mini-games and modal-driven player choices.
+* Wins, losses, draws and rating
+* Match history
+* Achievements and coin rewards
+* Rule collection progress
+* Friends, rivals and clubs
+* Profile customisation
+* Equipped cosmetics
+* Singleplayer campaign progress
 
-### Accounts And Progression
+### Singleplayer campaign
 
-Accounts are lightweight but full-featured:
+A singleplayer mode runs matches against Chaos Bot using the same underlying game systems as multiplayer.
 
-- Signup/login/logout with password hashing.
-- Bearer-token authenticated API routes.
-- Profile settings and public profile pages.
-- Stats: wins, losses, draws, rating, peak rating, captures, checkmates, coins, streaks, rule usage, hazard deaths, and more.
-- Match history and rule collection tracking.
-- Achievements that award coins automatically.
-- Friends, rivals, and clubs.
-- Singleplayer campaign progress and unlockable rule pools.
+Campaign progress can unlock additional rule pools and is stored alongside the player's account data.
 
-### Cosmetics And Shop
+### Cosmetics
 
-Players can earn and spend coins on cosmetics:
+Coins earned through play can be spent on cosmetic items including:
 
-- DiceBear icon themes, using stable seeded avatars.
-- Profile banners.
-- Board skins.
-- Piece skins.
-- Animated borders.
-- Emotes.
-- Rule card backs.
+* Avatar styles
+* Profile banners
+* Board skins
+* Piece skins
+* Animated profile borders
+* Emotes
+* Rule card backs
 
-The daily shop uses deterministic daily rotation and caps avatar/icon themes to at most one daily offer, keeping the shop varied instead of flooding it with icon cosmetics.
+Avatar graphics are generated with DiceBear using stable player-specific seeds so an account can retain a consistent identity across available styles.
 
-## Tech Stack
+## Basic workflow
 
-- **Frontend:** HTML, CSS, vanilla JavaScript, Canvas API
-- **Realtime:** Socket.IO
-- **Backend:** Node.js, Express
-- **Persistence:** JSON file store for local development, optional PostgreSQL via `pg`
-- **Avatar generation:** DiceBear `@dicebear/core` and `@dicebear/collection`
-- **Architecture:** Authoritative server with client-side rendering and optimistic UI only where safe
+1. Create an account or sign in.
+2. Start a singleplayer game, create a lobby or join another player's lobby.
+3. Make a legal chess move from the browser.
+4. The server validates the move and broadcasts the resulting player-specific state.
+5. When a rule draft begins, each player chooses from the available rule cards.
+6. The server resolves the selected effects and updates the match.
+7. Continue through normal moves, rule events and mini-games until a win condition is reached.
+8. Completed matches update persistent statistics, progression and rewards.
 
-## Run Locally
+## Architecture
 
-Prerequisites:
+Chaos Chess uses an authoritative client-server architecture.
 
-- Node.js 18+
-- npm
+The browser is responsible for presentation, input and animation. It renders the board and game effects, displays menus and modals, and sends player intentions to the backend.
 
-Install and start:
+The Node.js server owns the actual match state. Chess moves, rule effects, timers, lobby membership, mini-games and results are processed on the server before updated state is sent back through Socket.IO. This prevents each browser from maintaining an independent version of the game.
 
-```powershell
+Core chess rules and Chaos-specific behaviour are separated into different modules. `ChessEngine.js` handles standard chess mechanics, while `Game.js` coordinates match state and `RuleManager.js` manages the lifecycle of rule effects.
+
+Account handling is kept outside the game engine. The account service manages authentication, profiles, progression, cosmetics, social information and persistence. Match results are passed into a separate recorder which updates the relevant account statistics after a game.
+
+Persistence can use PostgreSQL when a database connection is configured or fall back to a local JSON store during development.
+
+## Tech stack
+
+* **Frontend:** HTML, CSS, vanilla JavaScript, Canvas API
+* **Backend:** Node.js, Express
+* **Realtime networking:** Socket.IO
+* **Persistence:** PostgreSQL or local JSON storage
+* **Database client:** `pg`
+* **Avatar generation:** DiceBear
+* **Package management:** npm
+
+## Project structure
+
+```text
+server.js                         Express and Socket.IO application entry point
+
+public/
+  index.html                      Main browser interface and modal structure
+  client.js                       Game renderer, interactions and client behaviour
+  style.css                       Layout, themes, animations and responsive styling
+  js/                             Smaller browser-side modules
+
+src/server/
+  accountService.js               Authentication, profiles, persistence and progression
+  botController.js                Singleplayer opponent behaviour
+  lobby.js                        Lobby and room helpers
+  matchRecorder.js                Match results, ratings and account updates
+  realtimeController.js           Socket.IO lobby and game event handling
+
+src/server/game/
+  ChessEngine.js                  Standard chess rules and legal move generation
+  Game.js                         Match state and Chaos-specific game orchestration
+  miniGames.js                    Interactive rule mini-games
+  results.js                      Match result handling
+  stateUtils.js                   Shared game-state helpers
+
+src/server/game/rules/
+  RuleManager.js                  Rule timing and lifecycle management
+  ruleset.js                      Chaos rule definitions
+```
+
+## Configuration
+
+The application reads configuration from environment variables and can also load local `.env` or `env` files.
+
+| Variable            | Required | Purpose                                                                     |
+| ------------------- | -------- | --------------------------------------------------------------------------- |
+| `PORT`              | No       | HTTP server port. Defaults to `3000`.                                       |
+| `DATABASE_URL`      | No       | PostgreSQL connection string used for persistent account storage.           |
+| `NEON_DATABASE_URL` | No       | Alternative PostgreSQL connection variable.                                 |
+| `POSTGRES_URL`      | No       | Alternative PostgreSQL connection variable.                                 |
+| `DISABLE_DATABASE`  | No       | Forces the application to use local JSON persistence instead of PostgreSQL. |
+| `DEBUG_MODE`        | No       | Controls the application's runtime debug behaviour.                         |
+
+When no database URL is supplied, user, session and club data are stored locally instead.
+
+Never commit real database credentials or other secrets to the repository.
+
+## Run locally
+
+Requires Node.js and npm.
+
+Install the dependencies:
+
+```bash
 npm install
+```
+
+Start the server:
+
+```bash
 npm start
 ```
 
-Open:
+The application is then available at:
 
 ```text
 http://localhost:3000
 ```
 
-Development uses the same entry point:
+The development script currently runs the same server entry point:
 
-```powershell
+```bash
 npm run dev
 ```
 
-Tests:
+## Persistence
 
-```powershell
+Chaos Chess supports two persistence modes.
+
+### Local development
+
+Without a configured PostgreSQL connection, account state is stored in a JSON file. This keeps local setup lightweight and allows the application to run without an external database service.
+
+### PostgreSQL
+
+When a supported database URL is available, the account service creates and uses PostgreSQL tables for users, sessions and clubs.
+
+Database changes are serialised through the account service and written using parameterised queries and transactions where multiple related operations need to remain consistent.
+
+## Security and privacy
+
+Game actions are validated by the authoritative server rather than trusting the state calculated by individual clients.
+
+Account and session handling is also performed by the backend, while authenticated API operations use session credentials rather than relying on browser-provided identity alone.
+
+The application accepts JSON request bodies with a defined size limit and keeps database credentials outside the source through environment configuration.
+
+Player account information, game statistics, progression, social data and session state are persisted either locally or in PostgreSQL depending on configuration.
+
+## Testing
+
+The repository does not currently contain an automated test suite.
+
+The existing npm test command is a placeholder:
+
+```bash
 npm test
 ```
 
-Note: the current test script is a placeholder, but the codebase is organized so engine, rule, and account tests can be added cleanly.
+It currently reports that no tests are configured rather than running unit or integration tests.
 
-## Configuration
+## Deployment
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `PORT` | `3000` | HTTP server port. |
-| `DATABASE_URL` | empty | PostgreSQL connection string. If absent, account data is stored in `data/users.json`. |
-| `NEON_DATABASE_URL` | empty | Alternate PostgreSQL connection string. |
-| `POSTGRES_URL` | empty | Alternate PostgreSQL connection string. |
-| `DISABLE_DATABASE` | `false` | Forces JSON storage even if a database URL exists. |
-| `DEBUG_MODE` | `true` | Enables debug/runtime behavior used by the app. |
-| `RULE_CHOICE_EVERY_PLIES` | `7` | How often rule drafts appear. |
-| `RULE_CHOICE_DURATION_MS` | `30000` | Rule draft timer duration in milliseconds. |
+The application runs as a single Node.js service containing both the Express API and Socket.IO server. Static browser files are served directly by Express, so the frontend and realtime backend can be deployed together.
 
-Example:
+The current public deployment is hosted on Render:
 
-```dotenv
-PORT=3000
-DATABASE_URL=postgresql://user:password@host/db?sslmode=require
-DEBUG_MODE=false
-```
+https://chaoschess.onrender.com/
 
-## Backend API
+Production deployments can use PostgreSQL for persistent account data while local development can operate without an external database.
 
-Most account routes return JSON shaped like:
+## Engineering decisions
 
-```json
-{ "ok": true }
-```
+### Authoritative multiplayer state
 
-Errors return:
+Clients send player intentions rather than directly deciding the result of a move. The server validates actions and distributes the resulting state, keeping chess rules and Chaos effects consistent between both players.
 
-```json
-{ "ok": false, "error": "Message" }
-```
+### Separate chess and Chaos logic
 
-Authenticated routes expect:
+Standard chess behaviour is isolated inside `ChessEngine.js`, while match orchestration and variant effects live in separate game and rule modules. This prevents every new Chaos rule from being embedded directly into basic move generation.
 
-```http
-Authorization: Bearer <session-token>
-```
+### Player-specific synchronisation
 
-### Public REST Endpoints
+The realtime controller can send state tailored to an individual player. This allows mechanics involving hidden or private information without exposing the complete server state to every connected client.
 
-| Method | Route | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/rules` | Returns public rule card metadata for the rulebook and campaign UI. |
-| `GET` | `/api/avatar/:style.svg?seed=...` | Generates a DiceBear SVG avatar for a supported icon theme and seed. |
-| `GET` | `/api/users/:username/profile` | Returns a public profile for another player. |
+### Dual persistence
 
-### Auth REST Endpoints
+Supporting both local JSON and PostgreSQL keeps development setup simple while allowing the deployed application to use a proper database without requiring two separate account systems.
 
-| Method | Route | Purpose |
-| --- | --- | --- |
-| `POST` | `/api/auth/signup` | Creates an account, initializes profile/stats/campaign, and returns a token. |
-| `POST` | `/api/auth/login` | Authenticates and returns a session token. |
-| `POST` | `/api/auth/logout` | Deletes the current session token. |
-| `DELETE` | `/api/me` | Deletes the authenticated account and sessions. |
+### Connection recovery
 
-### Account REST Endpoints
+Socket.IO connection-state recovery and player reconnection logic allow a temporary network interruption to be handled without immediately discarding an active match.
 
-| Method | Route | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/me` | Returns the authenticated user, stats, cosmetics, achievements, campaign, and profile. |
-| `PATCH` | `/api/me` | Updates username, profile fields, and equipped cosmetics. |
-| `PATCH` | `/api/me/password` | Changes password after verifying the current password. |
-| `POST` | `/api/me/friends` | Adds a friend by username. |
+## Limitations
 
-### Campaign And Shop REST Endpoints
-
-| Method | Route | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/me/campaign` | Returns current singleplayer campaign progress. |
-| `PATCH` | `/api/me/campaign` | Resets campaign or opens a campaign chest. |
-| `GET` | `/api/shop/daily` | Returns deterministic daily shop offers and reset time. |
-| `POST` | `/api/me/shop/buy` | Purchases a daily shop cosmetic with coins. |
-
-### Admin REST Endpoints
-
-Admin routes require an authenticated admin account.
-
-| Method | Route | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/admin/users` | Lists sanitized user payloads. |
-| `PATCH` | `/api/admin/users/:id` | Edits user profile, stats, cosmetics, social data, and selected account fields. |
-| `GET` | `/api/admin/flags` | Reads runtime flags. |
-| `PATCH` | `/api/admin/flags` | Updates runtime flags, such as debug mode. |
-
-## Realtime Socket API
-
-All game/lobby actions are Socket.IO events. Most client emissions include a callback response:
-
-```js
-{ ok: true }
-```
-
-or:
-
-```js
-{ ok: false, error: "Message" }
-```
-
-### Client -> Server Lobby Events
-
-| Event | Payload | Purpose |
-| --- | --- | --- |
-| `lobby:listOpen` | `{}` | Lists public lobbies. |
-| `lobby:create` | `{ authToken, visibility }` | Creates a public/private multiplayer lobby. |
-| `lobby:join` | `{ code, authToken }` | Joins a lobby by code. |
-| `lobby:singleplayer` | `{ authToken, campaignLevel, rulePoolIds }` | Starts a singleplayer bot match. |
-| `lobby:resume` | `{ code, playerId }` | Rebinds a reconnecting socket to a player. |
-| `lobby:leave` | `{ code, playerId }` | Leaves and closes a lobby. |
-
-### Client -> Server Game Events
-
-| Event | Payload | Purpose |
-| --- | --- | --- |
-| `game:sync` | `{ code, playerId }` | Requests current player-specific state. |
-| `game:requestMoves` | `{ code, playerId, from }` | Gets legal destinations for a square. |
-| `game:move` | `{ code, playerId, from, to, promotion }` | Attempts a chess move. |
-| `game:chooseRule` | `{ code, playerId, ruleId }` | Picks a draft rule card. |
-| `game:ruleTarget` | `{ code, playerId, square }` | Submits a target square for targeted rules. |
-| `game:pawnSoldierShot` | `{ code, playerId, target }` | Fires a Pawn Soldier shot. |
-| `game:mutantSelection` | `{ code, playerId, squares }` | Updates selected pieces for Mutant fusion. |
-| `game:mutantConfirm` | `{ code, playerId }` | Confirms Mutant fusion. |
-| `game:supermarketPurchase` | `{ code, playerId, items }` | Buys pieces during Supermarket. |
-| `game:fruitMachineSpin` | `{ code, playerId }` | Spins the Fruit Machine. |
-| `game:fruitMachineCollect` | `{ code, playerId }` | Collects Fruit Machine prizes. |
-| `game:rpsChoice` | `{ code, playerId, choice }` | Submits rock/paper/scissors. |
-| `game:wagerSelection` | `{ code, playerId, squares }` | Selects wagered pieces. |
-| `game:wagerConfirm` | `{ code, playerId }` | Confirms Coinflip Wager selection. |
-| `game:ready` | `{ code, playerId }` | Toggles rematch readiness. |
-| `game:emote` | `{ code, playerId }` | Sends the equipped emote to the room. |
-
-### Server -> Client Events
-
-| Event | Purpose |
-| --- | --- |
-| `game:state` | Player-specific authoritative game state, including board, phase, rules, effects, and private data where relevant. |
-| `game:emote` | Broadcasts a player's equipped emote. |
-| `lobby:message` | Lobby status messages such as reconnects/disconnects. |
-| `lobby:closed` | Indicates the room closed. |
-| `lobby:openServers` | Broadcasts the current public server list. |
-
-## Project Structure
-
-```text
-server.js                         Express app, HTTP server, Socket.IO bootstrapping
-src/server/accountService.js      Auth, profiles, API routes, shop, campaign, admin
-src/server/account/achievements.js
-src/server/account/cosmetics.js
-src/server/botController.js       Singleplayer bot behavior
-src/server/lobby.js               Room code and room model helpers
-src/server/matchRecorder.js       Match stats, rating, history, achievements
-src/server/realtimeController.js  Socket.IO lobby/game event controller
-src/server/game/ChessEngine.js    Core chess rules and legal move generation
-src/server/game/Game.js           Match state, phases, effects, rule orchestration
-src/server/game/miniGames.js      RPS, wager, supermarket, fruit machine, mutant flows
-src/server/game/rules/ruleset.js  Rule card definitions
-public/index.html                 UI shell and modals
-public/client.js                  Canvas renderer, UI behavior, Socket.IO client
-public/style.css                  Responsive styling, themes, animations
-public/js/*                       Smaller browser modules for DOM/storage/realtime helpers
-data/users.json                   Local fallback persistence
-```
-
-## Why This Project Stands Out
-
-Chaos Chess is not a static clone or tutorial app. It demonstrates:
-
-- Designing an authoritative realtime game server.
-- Building custom game rules without relying on a third-party chess engine.
-- Managing long-lived multiplayer state, reconnects, timers, private player data, and bot games.
-- Creating a full account/progression loop around gameplay.
-- Integrating generated avatar assets through deterministic seeds.
-- Shipping a polished frontend with canvas rendering, modals, animations, responsive layout, and profile/shop systems.
-
-## License
-
-ISC. See `package.json`.
+* Automated tests are not currently configured.
+* The browser client is implemented primarily in a large vanilla JavaScript application rather than a component framework.
+* Local JSON persistence is intended as a lightweight development fallback rather than a replacement for the PostgreSQL-backed deployment.
